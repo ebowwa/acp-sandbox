@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACP Sandbox Test Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .step {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .step.active {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .step.completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .endpoint-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Agentic Commerce Protocol Sandbox</h1>
+            <p>Test ACP checkout flows with mock merchant API</p>
+            <div class="status" id="serverStatus">
+                Checking server status...
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Left Column: Configuration -->
+            <div>
+                <div class="section">
+                    <h2>🔧 Configuration</h2>
+
+                    <div class="form-group">
+                        <label for="serverUrl">Server URL:</label>
+                        <input type="text" id="serverUrl" value="http://localhost:3000" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="authToken">Auth Token:</label>
+                        <input type="text" id="authToken" value="test_token_12345" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apiVersion">API Version:</label>
+                        <input type="text" id="apiVersion" value="2025-09-29" readonly />
+                    </div>
+
+                    <h3>🛒 Test Product</h3>
+                    <div class="form-group">
+                        <label for="productId">Product ID:</label>
+                        <input type="text" id="productId" value="item_123" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" value="1" min="1" />
+                    </div>
+
+                    <h3>🏠 Fulfillment Address</h3>
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" value="John Doe" />
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="lineOne">Address Line 1:</label>
+                            <input type="text" id="lineOne" value="1234 Chat Road" />
+                        </div>
+                        <div class="form-group">
+                            <label for="lineTwo">Address Line 2:</label>
+                            <input type="text" id="lineTwo" value="" />
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="city">City:</label>
+                            <input type="text" id="city" value="San Francisco" />
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State:</label>
+                            <input type="text" id="state" value="CA" />
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code:</label>
+                            <input type="text" id="postalCode" value="94131" />
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country:</label>
+                            <input type="text" id="country" value="US" />
+                        </div>
+                    </div>
+
+                    <h3>💳 Payment Info</h3>
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number:</label>
+                        <input type="text" id="cardNumber" value="4242424242424242" />
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="expMonth">Exp Month:</label>
+                            <input type="text" id="expMonth" value="11" />
+                        </div>
+                        <div class="form-group">
+                            <label for="expYear">Exp Year:</label>
+                            <input type="text" id="expYear" value="2026" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cvc">CVC:</label>
+                        <input type="text" id="cvc" value="223" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buyerEmail">Buyer Email:</label>
+                        <input type="email" id="buyerEmail" value="johnsmith@example.com" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Test Execution -->
+            <div>
+                <div class="section">
+                    <h2>🧪 Test Flows</h2>
+
+                    <div id="testSteps">
+                        <div class="step" id="step1">
+                            <strong>Step 1:</strong> Create Checkout Session
+                        </div>
+                        <div class="step" id="step2">
+                            <strong>Step 2:</strong> Update Fulfillment Option
+                        </div>
+                        <div class="step" id="step3">
+                            <strong>Step 3:</strong> Create Payment Token
+                        </div>
+                        <div class="step" id="step4">
+                            <strong>Step 4:</strong> Complete Checkout
+                        </div>
+                        <div class="step" id="step5">
+                            <strong>Step 5:</strong> Retrieve Final Session
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button onclick="runFullFlow()">🚀 Run Complete Flow</button>
+                        <button onclick="runIndividualTests()">🔬 Test Individual Steps</button>
+                        <button onclick="clearResults()">🗑️ Clear Results</button>
+                    </div>
+
+                    <div class="endpoint-info">
+                        <strong>Available Endpoints:</strong><br>
+                        POST /checkout_sessions<br>
+                        POST /checkout_sessions/:id<br>
+                        GET /checkout_sessions/:id<br>
+                        POST /checkout_sessions/:id/complete<br>
+                        POST /checkout_sessions/:id/cancel<br>
+                        POST /agentic_commerce/delegate_payment
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📊 Results</h2>
+                    <div id="results" class="response" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let currentTokenId = null;
+        let allResults = [];
+
+        // Check server health on load
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(document.getElementById('serverUrl').value + '/health');
+                const data = await response.json();
+
+                const statusEl = document.getElementById('serverStatus');
+                statusEl.className = 'status success';
+                statusEl.innerHTML = `✅ Server is healthy - ${data.sessions} sessions, ${data.orders} orders, ${data.tokens} tokens`;
+            } catch (error) {
+                const statusEl = document.getElementById('serverStatus');
+                statusEl.className = 'status error';
+                statusEl.innerHTML = '❌ Server is not responding - make sure it\'s running on port 3000';
+            }
+        }
+
+        // Get auth headers
+        function getAuthHeaders() {
+            return {
+                'Authorization': 'Bearer ' + document.getElementById('authToken').value,
+                'API-Version': document.getElementById('apiVersion').value,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+        }
+
+        // Get address form data
+        function getAddressData() {
+            return {
+                name: document.getElementById('name').value,
+                line_one: document.getElementById('lineOne').value,
+                line_two: document.getElementById('lineTwo').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                postal_code: document.getElementById('postalCode').value,
+                country: document.getElementById('country').value
+            };
+        }
+
+        // Get items data
+        function getItemsData() {
+            return [{
+                id: document.getElementById('productId').value,
+                quantity: parseInt(document.getElementById('quantity').value)
+            }];
+        }
+
+        // Get payment data
+        function getPaymentData() {
+            return {
+                payment_method: {
+                    type: 'card',
+                    card_number_type: 'fpan',
+                    virtual: false,
+                    number: document.getElementById('cardNumber').value,
+                    exp_month: document.getElementById('expMonth').value,
+                    exp_year: document.getElementById('expYear').value,
+                    name: document.getElementById('name').value,
+                    cvc: document.getElementById('cvc').value,
+                    checks_performed: ['avs', 'cvv'],
+                    iin: document.getElementById('cardNumber').value.substring(0, 6),
+                    display_card_funding_type: 'credit',
+                    display_brand: 'visa',
+                    display_last4: document.getElementById('cardNumber').value.substring(-4),
+                    metadata: {}
+                },
+                allowance: {
+                    reason: 'one_time',
+                    max_amount: 10000, // $100
+                    currency: 'usd',
+                    checkout_session_id: currentSessionId,
+                    merchant_id: 'test_merchant',
+                    expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour
+                },
+                billing_address: getAddressData(),
+                risk_signals: [{
+                    type: 'card_testing',
+                    score: 10,
+                    action: 'authorized'
+                }],
+                metadata: {
+                    source: 'acp_sandbox',
+                    test_mode: true
+                }
+            };
+        }
+
+        // Update step status
+        function updateStepStatus(stepId, status) {
+            const step = document.getElementById(stepId);
+            step.className = `step ${status}`;
+        }
+
+        // Add result
+        function addResult(step, response, isError = false) {
+            allResults.push({
+                step: step,
+                response: response,
+                isError: isError,
+                timestamp: new Date().toISOString()
+            });
+            displayResults();
+        }
+
+        // Display all results
+        function displayResults() {
+            const resultsEl = document.getElementById('results');
+            if (allResults.length === 0) {
+                resultsEl.style.display = 'none';
+                return;
+            }
+
+            resultsEl.style.display = 'block';
+            resultsEl.className = 'response';
+            resultsEl.textContent = JSON.stringify(allResults, null, 2);
+        }
+
+        // Clear results
+        function clearResults() {
+            allResults = [];
+            currentSessionId = null;
+            currentTokenId = null;
+            displayResults();
+
+            // Reset step indicators
+            for (let i = 1; i <= 5; i++) {
+                updateStepStatus(`step${i}`, '');
+            }
+        }
+
+        // Run complete flow
+        async function runFullFlow() {
+            clearResults();
+
+            try {
+                // Step 1: Create checkout session
+                updateStepStatus('step1', 'active');
+                const createResponse = await createCheckoutSession();
+                addResult('Create Checkout Session', createResponse);
+                updateStepStatus('step1', 'completed');
+
+                // Step 2: Update fulfillment option
+                updateStepStatus('step2', 'active');
+                const updateResponse = await updateFulfillmentOption();
+                addResult('Update Fulfillment Option', updateResponse);
+                updateStepStatus('step2', 'completed');
+
+                // Step 3: Create payment token
+                updateStepStatus('step3', 'active');
+                const tokenResponse = await createPaymentToken();
+                addResult('Create Payment Token', tokenResponse);
+                updateStepStatus('step3', 'completed');
+
+                // Step 4: Complete checkout
+                updateStepStatus('step4', 'active');
+                const completeResponse = await completeCheckout();
+                addResult('Complete Checkout', completeResponse);
+                updateStepStatus('step4', 'completed');
+
+                // Step 5: Retrieve final session
+                updateStepStatus('step5', 'active');
+                const retrieveResponse = await retrieveSession();
+                addResult('Retrieve Final Session', retrieveResponse);
+                updateStepStatus('step5', 'completed');
+
+            } catch (error) {
+                console.error('Flow error:', error);
+                addResult('Error', error.message || error, true);
+            }
+        }
+
+        // Individual test functions
+        async function createCheckoutSession() {
+            const response = await fetch(document.getElementById('serverUrl').value + '/checkout_sessions', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    items: getItemsData(),
+                    fulfillment_address: getAddressData()
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            currentSessionId = data.id;
+            return data;
+        }
+
+        async function updateFulfillmentOption() {
+            if (!currentSessionId) throw new Error('No active session');
+
+            // First get session to see available options
+            const getResponse = await fetch(document.getElementById('serverUrl').value + `/checkout_sessions/${currentSessionId}`, {
+                headers: getAuthHeaders()
+            });
+            const sessionData = await getResponse.json();
+
+            if (!getResponse.ok) throw sessionData;
+
+            // Choose the second (express) option if available
+            const expressOption = sessionData.fulfillment_options.find(opt => opt.title === 'Express');
+            const targetOption = expressOption || sessionData.fulfillment_options[1];
+
+            const response = await fetch(document.getElementById('serverUrl').value + `/checkout_sessions/${currentSessionId}`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    fulfillment_option_id: targetOption.id
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            return data;
+        }
+
+        async function createPaymentToken() {
+            const response = await fetch(document.getElementById('serverUrl').value + '/agentic_commerce/delegate_payment', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(getPaymentData())
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            currentTokenId = data.id;
+            return data;
+        }
+
+        async function completeCheckout() {
+            if (!currentSessionId || !currentTokenId) throw new Error('Missing session or token');
+
+            const response = await fetch(document.getElementById('serverUrl').value + `/checkout_sessions/${currentSessionId}/complete`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    buyer: {
+                        first_name: document.getElementById('name').value.split(' ')[0],
+                        last_name: document.getElementById('name').value.split(' ')[1] || 'Doe',
+                        email: document.getElementById('buyerEmail').value
+                    },
+                    payment_data: {
+                        token: currentTokenId,
+                        provider: 'stripe',
+                        billing_address: getAddressData()
+                    }
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            return data;
+        }
+
+        async function retrieveSession() {
+            if (!currentSessionId) throw new Error('No active session');
+
+            const response = await fetch(document.getElementById('serverUrl').value + `/checkout_sessions/${currentSessionId}`, {
+                headers: getAuthHeaders()
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            return data;
+        }
+
+        // Run individual tests
+        async function runIndividualTests() {
+            clearResults();
+
+            try {
+                // Test: Create session
+                updateStepStatus('step1', 'active');
+                const createData = await createCheckoutSession();
+                addResult('1. Create Session', createData);
+                updateStepStatus('step1', 'completed');
+
+                // Test: Get session
+                const getData = await retrieveSession();
+                addResult('2. Get Session', getData);
+
+                // Test: Update session (already done above)
+                updateStepStatus('step2', 'active');
+                const updateData = await updateFulfillmentOption();
+                addResult('3. Update Session', updateData);
+                updateStepStatus('step2', 'completed');
+
+                // Test: Create token
+                updateStepStatus('step3', 'active');
+                const tokenData = await createPaymentToken();
+                addResult('4. Create Token', tokenData);
+                updateStepStatus('step3', 'completed');
+
+                // Test: Complete
+                updateStepStatus('step4', 'active');
+                const completeData = await completeCheckout();
+                addResult('5. Complete Checkout', completeData);
+                updateStepStatus('step4', 'completed');
+
+                // Test: Final retrieve
+                updateStepStatus('step5', 'active');
+                const finalData = await retrieveSession();
+                addResult('6. Final Retrieve', finalData);
+                updateStepStatus('step5', 'completed');
+
+            } catch (error) {
+                console.error('Test error:', error);
+                addResult('Test Error', error.message || error, true);
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            checkServerHealth();
+
+            // Check server health periodically
+            setInterval(checkServerHealth, 30000);
+        };
+    </script>
+</body>
+</html>
