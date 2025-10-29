@@ -2,6 +2,29 @@
 
 A fully functional sandbox environment for testing the **Agentic Commerce Protocol (ACP)** based on the official OpenAI/Stripe specifications.
 
+## 🎯 What This Actually Is
+
+**Think of this as a complete fake e-commerce store** - not just a payment processor.
+
+```
+Fake Product Feed + Fake Payment System = Complete Mock Store
+```
+
+**What the Sandbox Simulates:**
+- 🏪 **Mock Store**: Acts like Amazon, Target, or any online retailer
+- 📦 **Fake Product Catalog**: Generates mock items with realistic pricing
+- 🚚 **Mock Shipping**: Calculates delivery options and costs
+- 💳 **Mock Payment Processing**: Handles fake transactions securely
+- 📋 **Mock Order Management**: Creates fake order confirmations
+
+**What It's NOT:**
+- ❌ A real e-commerce platform (like Shopify)
+- ❌ A shopping assistant/agent (that's what ChatGPT becomes)
+- ❌ Real payment processing (no actual money involved)
+
+**The Goal:**
+Build AI agents (like ChatGPT with custom instructions) that can help users shop and buy things by practicing against this safe, mock environment before connecting to real stores.
+
 ## 🚀 Quick Start
 
 ```bash
